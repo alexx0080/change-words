@@ -1,5 +1,5 @@
 import sqlite3 as sql
-from 
+import config
 
 class TableWords:
     def __init__(self):
@@ -36,4 +36,4 @@ class TableWords:
         return translate
     
 
-print('asdg')
+
