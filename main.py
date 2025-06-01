@@ -19,7 +19,7 @@ class AddWord(StatesGroup):
     get_translate = State()
 
 # Создать машину состояний для получения слова
-class GetWord(StatesGroup)
+class GetWord(StatesGroup):
     get_translate = State()
 
 
@@ -72,6 +72,7 @@ async def get_translate(message: Message, state: FSMContext):
     else:
         await message.answer('Введите корректный перевод, состоящий только из букв')
 
+# Button
 @dp.callback_query(F.data == 'add_word')
 async def add_word_button(callback: CallbackQuery, state: FSMContext):
     await add_word_func(callback.message, state)
@@ -100,7 +101,12 @@ async def get_translate_get_word(message: Message, state: FSMContext):
         await state.clear()
     else:
         await message.answer(f'Введите корректный перевод, состоящий только из букв')
-        
+
+# Button
+@dp.callback_query(F.data == 'get_word')
+async def get_word_button(callback: CallbackQuery, state: FSMContext):
+    await get_word_func(callback.message, state)
+
 
 
 # Запуск
