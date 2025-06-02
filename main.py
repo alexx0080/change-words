@@ -94,7 +94,7 @@ async def get_translate_get_word(message: Message, state: FSMContext):
         dictionary = await state.get_data()
         eng_word = dictionary['english_word']
         true_translate = word_obj.read_string(eng_word)
-        if translate == true_translate:
+        if translate.lower() == true_translate:
             await message.answer('Молодец, абсолютно верно!')
         else:
             await message.answer(f'Неправильно. Это слово переводится как {true_translate}')
