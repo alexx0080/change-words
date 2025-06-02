@@ -5,6 +5,7 @@ from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineKe
 from aiogram.filters import Command, CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
+from datetime import datetime
 
 
 
@@ -81,10 +82,13 @@ async def add_word_button(callback: CallbackQuery, state: FSMContext):
 # Команда получить + кнопка get_word
 @dp.message(Command('get_word'))
 async def get_word_func(message: Message, state: FSMContext):
+    await get_word(message, state)
+
+async def get_word(message: Message, state: FSMContext):
     list_words = word_obj.read_table()
     random_word = random.choice(list_words)
     await state.update_data(english_word = random_word)
-    await message.answer(f'''Итак, вот твое слово: {random_word.capitalize()}\nПереведи его''')
+    await bot.send_message(chat_id=2098934569, text=f'''Итак, вот твое слово: {random_word.capitalize()}\nПереведи его''')
     await state.set_state(GetWord.get_translate)
 
 @dp.message(GetWord.get_translate)
@@ -95,22 +99,34 @@ async def get_translate_get_word(message: Message, state: FSMContext):
         eng_word = dictionary['english_word']
         true_translate = word_obj.read_string(eng_word)
         if translate == true_translate:
-            await message.answer('Молодец, абсолютно верно!')
+            await bot.send_message(chat_id=2098934569, text='Молодец, абсолютно верно!')
         else:
-            await message.answer(f'Неправильно. Это слово переводится как {true_translate}')
+            await bot.send_message(chat_id=2098934569, text=f'Неправильно. Это слово переводится как {true_translate}')
         await state.clear()
     else:
-        await message.answer(f'Введите корректный перевод, состоящий только из букв')
+        await bot.send_message(chat_id=2098934569, text=f'Введите корректный перевод, состоящий только из букв')
 
 # Button
 @dp.callback_query(F.data == 'get_word')
 async def get_word_button(callback: CallbackQuery, state: FSMContext):
-    await get_word_func(callback.message, state)
+    await get_word(callback.message, state)
 
+
+
+
+
+# Отправка по кд
+async def send_word(bot: Bot):
+    while True:
+        message = types.Message(chat=types.Chat(id=2098934569, type='private'), from_user=types.User(id=2098934569, is_bot=False, first_name='alex'), message_id=1, date=datetime.now(), text="Test message")
+        state = dp.fsm.get_context(bot, 2098934569, 2098934569)
+        await get_word(message, state)
+        asyncio.sleep(3600000000)
 
 
 # Запуск
 async def main():
+    asyncio.create_task(send_word(bot))
     await dp.start_polling(bot)
 
 if __name__ == '__main__':
