@@ -109,6 +109,13 @@ async def get_word_button(callback: CallbackQuery, state: FSMContext):
 
 
 
+# Функция посылающая пользователя нахуй
+@dp.message(F.text)
+async def go_fuck(message: Message):
+    await message.answer(f'Дорогой {message.from_user.first_name}, с уважением хочу послать вас нахуй')
+
+
+
 # Запуск
 async def main():
     await dp.start_polling(bot)
