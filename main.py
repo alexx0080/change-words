@@ -35,7 +35,7 @@ dp = Dispatcher()
 async def command_start(message: Message):
     button_add_word = InlineKeyboardButton(text='Добавить', callback_data='add_word')
     button_get_word = InlineKeyboardButton(text='Получить', callback_data='get_word')
-    button = InlineKeyboardMarkup(inline_keyboard=[[button_add_word, button_get_word]])
+    button = InlineKeyboardMarkup(inline_keyboard=[[button_add_word], [button_get_word]])
     await message.answer('Привет, я помогу тебе с запоминанием Английский слов!\nПиши мне проблематичные слова и их перевод, я их буду сохранять и периодически,\
 а также когда ты меня попросишь высылать их тебе и запрашивать перевод.', reply_markup=button)
     
@@ -106,13 +106,6 @@ async def get_translate_get_word(message: Message, state: FSMContext):
 @dp.callback_query(F.data == 'get_word')
 async def get_word_button(callback: CallbackQuery, state: FSMContext):
     await get_word_func(callback.message, state)
-
-
-
-# Функция посылающая пользователя нахуй
-@dp.message(F.text)
-async def go_fuck(message: Message):
-    await message.answer(f'Дорогой {message.from_user.first_name}, с уважением хочу послать вас нахуй')
 
 
 
