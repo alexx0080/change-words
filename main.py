@@ -33,11 +33,11 @@ dp = Dispatcher()
 # Команда start
 @dp.message(CommandStart())
 async def command_start(message: Message):
-    button_add_word = InlineKeyboardButton(text='Добавить', callback_data='add_word')
-    button_get_word = InlineKeyboardButton(text='Получить', callback_data='get_word')
+    button_add_word = InlineKeyboardButton(text='📚 Добавить 📚', callback_data='add_word')
+    button_get_word = InlineKeyboardButton(text='📩 Получить 📩', callback_data='get_word')
     button = InlineKeyboardMarkup(inline_keyboard=[[button_add_word], [button_get_word]])
-    await message.answer('Привет, я помогу тебе с запоминанием Английский слов!\nПиши мне проблематичные слова и их перевод, я их буду сохранять и периодически,\
-а также когда ты меня попросишь высылать их тебе и запрашивать перевод.', reply_markup=button)
+    await message.answer('Привет 👋\nЯ помогу тебе с запоминанием Английский слов! 😃\nПиши мне проблематичные слова и их перевод, я их буду сохранять и \
+когда ты меня попросишь высылать их тебе и запрашивать перевод.', reply_markup=button)
     
 
 # Команда добавить слово + кнопка
@@ -68,7 +68,8 @@ async def get_translate(message: Message, state: FSMContext):
         rus_word = dictionary['translate']
         await state.clear()
         word_obj.add_notice(eng_word, rus_word)
-        await message.answer('Отлично, слово добавлено в базу данных!')
+        await message.answer('Отлично, слово добавлено в базу данных! ✅')
+        await command_start(message)
     else:
         await message.answer('Введите корректный перевод, состоящий только из букв')
 
@@ -95,10 +96,11 @@ async def get_translate_get_word(message: Message, state: FSMContext):
         eng_word = dictionary['english_word']
         true_translate = word_obj.read_string(eng_word)
         if translate.lower() == true_translate:
-            await message.answer('Молодец, абсолютно верно!')
+            await message.answer('Молодец, абсолютно верно! ✅')
         else:
             await message.answer(f'Неправильно. Это слово переводится как {true_translate}')
         await state.clear()
+        await command_start(message)
     else:
         await message.answer(f'Введите корректный перевод, состоящий только из букв')
 
