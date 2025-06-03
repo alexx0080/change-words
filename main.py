@@ -142,7 +142,7 @@ def this_word_contain_only_letter(word):
 
 # Функция для создание очереди
 def add_word_in_queue(word):
-    if len(queue) < 10:
+    if len(queue) < 30:
         queue.append(word)
     else:
         queue.remove(queue[0])
