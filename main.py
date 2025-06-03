@@ -49,7 +49,7 @@ async def add_word_func(message: Message, state: FSMContext):
 @dp.message(AddWord.get_eng_word)
 async def get_english_word(message: Message, state: FSMContext):
     eng_word = message.text
-    if eng_word.isalpha():
+    if this_word_contain_only_letter(eng_word):
         eng_word = eng_word.lower()
         await state.update_data(english_word = eng_word)
         await message.answer('Введите перевод')
@@ -60,7 +60,7 @@ async def get_english_word(message: Message, state: FSMContext):
 @dp.message(AddWord.get_translate)
 async def get_translate(message: Message, state: FSMContext):
     trans = message.text
-    if trans.isalpha():
+    if this_word_contain_only_letter(trans):
         trans = trans.lower()
         await state.update_data(translate = trans)
         dictionary = await state.get_data()
@@ -90,7 +90,7 @@ async def get_word_func(message: Message, state: FSMContext):
 @dp.message(GetWord.get_translate)
 async def get_translate_get_word(message: Message, state: FSMContext):
     translate = message.text
-    if translate.isalpha():
+    if this_word_contain_only_letter(translate):
         dictionary = await state.get_data()
         eng_word = dictionary['english_word']
         true_translate = word_obj.read_string(eng_word)
@@ -106,6 +106,17 @@ async def get_translate_get_word(message: Message, state: FSMContext):
 @dp.callback_query(F.data == 'get_word')
 async def get_word_button(callback: CallbackQuery, state: FSMContext):
     await get_word_func(callback.message, state)
+
+
+
+# Функция для проверки слова
+async def this_word_contain_only_letter(word):
+    all_chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ',', '?', '!', '+', '-', '*', '/']
+    only_letters = False
+    for letter in word:
+        if letter in all_chars:
+            return False
+    return True
 
 
 
