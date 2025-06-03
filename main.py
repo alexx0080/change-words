@@ -8,6 +8,10 @@ from aiogram.fsm.state import State, StatesGroup
 
 
 
+# Создать список запрещенных символов
+all_chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ',', '?', '!', '+', '-', '*', '/']
+
+
 # Создать объект класса TableWord
 word_obj = table_with_words.TableWords()
 
@@ -49,7 +53,7 @@ async def add_word_func(message: Message, state: FSMContext):
 @dp.message(AddWord.get_eng_word)
 async def get_english_word(message: Message, state: FSMContext):
     eng_word = message.text
-    if this_word_contain_only_letter(eng_word):
+    if this_word_contain_only_letter(eng_word) == True:
         eng_word = eng_word.lower()
         await state.update_data(english_word = eng_word)
         await message.answer('Введите перевод')
@@ -60,7 +64,7 @@ async def get_english_word(message: Message, state: FSMContext):
 @dp.message(AddWord.get_translate)
 async def get_translate(message: Message, state: FSMContext):
     trans = message.text
-    if this_word_contain_only_letter(trans):
+    if this_word_contain_only_letter(trans) == True:
         trans = trans.lower()
         await state.update_data(translate = trans)
         dictionary = await state.get_data()
@@ -91,7 +95,7 @@ async def get_word_func(message: Message, state: FSMContext):
 @dp.message(GetWord.get_translate)
 async def get_translate_get_word(message: Message, state: FSMContext):
     translate = message.text
-    if this_word_contain_only_letter(translate):
+    if this_word_contain_only_letter(translate) == True:
         dictionary = await state.get_data()
         eng_word = dictionary['english_word']
         true_translate = word_obj.read_string(eng_word)
@@ -112,13 +116,13 @@ async def get_word_button(callback: CallbackQuery, state: FSMContext):
 
 
 # Функция для проверки слова
-async def this_word_contain_only_letter(word):
-    all_chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ',', '?', '!', '+', '-', '*', '/']
-    only_letters = False
+def this_word_contain_only_letter(word):
+    only_letters = True
     for letter in word:
         if letter in all_chars:
-            return False
-    return True
+            only_letters = False
+            break
+    return only_letters
 
 
 
