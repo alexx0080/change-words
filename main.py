@@ -12,6 +12,10 @@ from aiogram.fsm.state import State, StatesGroup
 all_chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ',', '?', '!', '+', '-', '*', '/']
 
 
+# Создать пустую очередь
+queue = []
+
+
 # Создать объект класса TableWord
 word_obj = table_with_words.TableWords()
 
@@ -53,13 +57,20 @@ async def add_word_func(message: Message, state: FSMContext):
 @dp.message(AddWord.get_eng_word)
 async def get_english_word(message: Message, state: FSMContext):
     eng_word = message.text
-    if this_word_contain_only_letter(eng_word) == True:
-        eng_word = eng_word.lower()
-        await state.update_data(english_word = eng_word)
-        await message.answer('Введите перевод')
-        await state.set_state(AddWord.get_translate)
+    eng_word = eng_word.lower()
+    list_words = word_obj.read_table()
+    if eng_word not in list_words:
+        if this_word_contain_only_letter(eng_word) == True:
+            await state.update_data(english_word = eng_word)
+            await message.answer('Введите перевод')
+            await state.set_state(AddWord.get_translate)
+        else:
+            await message.answer('⚠️ Введите корректное слово, состоящее только из букв ⚠️')
     else:
-        await message.answer('Введите корректное слово, состоящее только из букв')
+        translate = word_obj.read_string(eng_word)
+        await message.answer(f'❗ Слово уже было добавлено ❗\nВот его перевод - {translate.capitalize()}')
+        await state.clear()
+    
 
 @dp.message(AddWord.get_translate)
 async def get_translate(message: Message, state: FSMContext):
@@ -75,7 +86,7 @@ async def get_translate(message: Message, state: FSMContext):
         await message.answer('Отлично, слово добавлено в базу данных! ✅')
         await command_start(message)
     else:
-        await message.answer('Введите корректный перевод, состоящий только из букв')
+        await message.answer('⚠️ Введите корректный перевод, состоящий только из букв ⚠️')
 
 # Button
 @dp.callback_query(F.data == 'add_word')
@@ -88,8 +99,11 @@ async def add_word_button(callback: CallbackQuery, state: FSMContext):
 async def get_word_func(message: Message, state: FSMContext):
     list_words = word_obj.read_table()
     random_word = random.choice(list_words)
+    while random_word in queue:
+        random_word = random.choice(list_words)
+    add_word_in_queue(random_word)
     await state.update_data(english_word = random_word)
-    await message.answer(f'''Итак, вот твое слово: {random_word.capitalize()}\nПереведи его''')
+    await message.answer(f'''Итак, вот твое слово - {random_word.capitalize()}\nПереведи его''')
     await state.set_state(GetWord.get_translate)
 
 @dp.message(GetWord.get_translate)
@@ -102,11 +116,11 @@ async def get_translate_get_word(message: Message, state: FSMContext):
         if translate.lower() == true_translate:
             await message.answer('Молодец, абсолютно верно! ✅')
         else:
-            await message.answer(f'Неправильно. Это слово переводится как {true_translate}')
+            await message.answer(f'Неправильно ❌\nЭто слово переводится как {true_translate.capitalize()}.')
         await state.clear()
         await command_start(message)
     else:
-        await message.answer(f'Введите корректный перевод, состоящий только из букв')
+        await message.answer(f'⚠️ Введите корректный перевод, состоящий только из букв ⚠️')
 
 # Button
 @dp.callback_query(F.data == 'get_word')
@@ -123,6 +137,16 @@ def this_word_contain_only_letter(word):
             only_letters = False
             break
     return only_letters
+
+
+
+# Функция для создание очереди
+def add_word_in_queue(word):
+    if len(queue) < 10:
+        queue.append(word)
+    else:
+        queue.remove(queue[0])
+        queue.append(word)
 
 
 
