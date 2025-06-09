@@ -101,7 +101,6 @@ async def get_word_func(message: Message, state: FSMContext):
     random_word = random.choice(list_words)
     while random_word in queue:
         random_word = random.choice(list_words)
-    add_word_in_queue(random_word)
     await state.update_data(english_word = random_word)
     await message.answer(f'''Итак, вот твое слово - {random_word.capitalize()}\nПереведи его''')
     await state.set_state(GetWord.get_translate)
@@ -115,6 +114,8 @@ async def get_translate_get_word(message: Message, state: FSMContext):
         true_translate = word_obj.read_string(eng_word)
         if translate.lower() == true_translate:
             await message.answer('Молодец, абсолютно верно! ✅')
+            add_word_in_queue(eng_word)
+            print(queue)
         else:
             await message.answer(f'Неправильно ❌\nЭто слово переводится как {true_translate.capitalize()}.')
         await state.clear()
@@ -142,7 +143,7 @@ def this_word_contain_only_letter(word):
 
 # Функция для создание очереди
 def add_word_in_queue(word):
-    if len(queue) < 30:
+    if len(queue) < 50:
         queue.append(word)
     else:
         queue.remove(queue[0])
