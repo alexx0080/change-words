@@ -48,6 +48,16 @@ async def command_start(message: Message):
 когда ты меня попросишь высылать их тебе и запрашивать перевод.', reply_markup=button)
     
 
+
+# Команда меню
+async def menu(message: Message):
+    button_add_word = InlineKeyboardButton(text='📚 Добавить 📚', callback_data='add_word')
+    button_get_word = InlineKeyboardButton(text='📩 Получить 📩', callback_data='get_word')   
+    button = InlineKeyboardMarkup(inline_keyboard=[[button_add_word], [button_get_word]])
+    await message.answer('Выберите действие 👇', reply_markup=button)
+    
+
+
 # Команда добавить слово + кнопка
 @dp.message(Command('add_word'))
 async def add_word_func(message: Message, state: FSMContext):
@@ -84,7 +94,7 @@ async def get_translate(message: Message, state: FSMContext):
         await state.clear()
         word_obj.add_notice(eng_word, rus_word)
         await message.answer('Отлично, слово добавлено в базу данных! ✅')
-        await command_start(message)
+        await menu(message)
     else:
         await message.answer('⚠️ Введите корректный перевод, состоящий только из букв ⚠️')
 
@@ -115,11 +125,10 @@ async def get_translate_get_word(message: Message, state: FSMContext):
         if translate.lower() == true_translate:
             await message.answer('Молодец, абсолютно верно! ✅')
             add_word_in_queue(eng_word)
-            print(queue)
         else:
             await message.answer(f'Неправильно ❌\nЭто слово переводится как {true_translate.capitalize()}.')
         await state.clear()
-        await command_start(message)
+        await menu(message)
     else:
         await message.answer(f'⚠️ Введите корректный перевод, состоящий только из букв ⚠️')
 
@@ -148,6 +157,15 @@ def add_word_in_queue(word):
     else:
         queue.remove(queue[0])
         queue.append(word)
+
+
+
+# Обработка мусорных данных
+@dp.message()
+async def random_data(message: Message):
+    await message.answer('Пожалуйста, введите одну из команд\n\
+🗂 Вот список команд:\n📌 /start - Начало работы\n\
+📌 /add_word - Добавить слово\n📌 /get_word - Получить слово')
 
 
 
